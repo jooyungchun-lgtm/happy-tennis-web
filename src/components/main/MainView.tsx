@@ -6,6 +6,7 @@ import { authService } from '@/lib/auth';
 import { ChatRoom, Membership } from '@/types/models';
 import { formatDate, formatTime, getTimeUntil } from '@/lib/utils';
 import Button from '@/components/ui/Button';
+import SearchAndFilter from './SearchAndFilter';
 import { 
   CircleStackIcon,
   ExclamationTriangleIcon,
@@ -15,6 +16,7 @@ import {
 const MainView: React.FC = () => {
   const { userProfile } = useAuth();
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([]);
+  const [filteredChatRooms, setFilteredChatRooms] = useState<ChatRoom[]>([]);
   const [memberships, setMemberships] = useState<Record<string, Membership>>({});
   const [participantCounts, setParticipantCounts] = useState<Record<string, { male: number; female: number }>>({});
   const [loading, setLoading] = useState(true);
@@ -32,6 +34,7 @@ const MainView: React.FC = () => {
       ]);
 
       setChatRooms(rooms);
+      setFilteredChatRooms(rooms);
       setMemberships(userMemberships);
 
       // 참여 중인 채팅방 필터링
@@ -115,6 +118,12 @@ const MainView: React.FC = () => {
 
   return (
     <div className="flex-1 overflow-hidden">
+      {/* 검색 및 필터링 */}
+      <SearchAndFilter 
+        chatRooms={chatRooms} 
+        onFilteredRooms={setFilteredChatRooms} 
+      />
+      
       {/* 참여 중인 채팅방 섹션 */}
       {activeChatRooms.length > 0 && (
         <div className="bg-white/5 border-b border-white/10 p-4">
@@ -146,7 +155,7 @@ const MainView: React.FC = () => {
 
       {/* 채팅방 목록 */}
       <div className="flex-1 overflow-y-auto">
-        {chatRooms.length === 0 ? (
+        {filteredChatRooms.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-center">
             <CircleStackIcon className="h-16 w-16 text-white/30 mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">
@@ -162,7 +171,7 @@ const MainView: React.FC = () => {
           </div>
         ) : (
           <div className="p-4 space-y-4">
-            {chatRooms.map((room) => {
+            {filteredChatRooms.map((room) => {
               const status = getPersonalStatus(room.id || '');
               const counts = participantCounts[room.id as string] || { male: 0, female: 0 };
               const isParticipating = status !== 'none';

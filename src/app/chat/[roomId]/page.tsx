@@ -9,6 +9,8 @@ import { ArrowLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import ChatMessageComponent from '@/components/chat/ChatMessageComponent';
 import ChatInput from '@/components/chat/ChatInput';
 import LoadingSpinner from '@/components/shared/LoadingSpinner';
+import { useRealtimeChat } from '@/hooks/useRealtimeChat';
+import { notificationService } from '@/lib/notifications';
 
 const authService = new AuthService();
 
@@ -19,12 +21,14 @@ export default function ChatRoomPage() {
   const roomId = params.roomId as string;
   
   const [chatRoom, setChatRoom] = useState<ChatRoom | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isParticipating, setIsParticipating] = useState(false);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // 실시간 채팅 훅 사용
+  const { messages, loading: messagesLoading, error: messagesError } = useRealtimeChat(roomId);
 
   // 스크롤을 맨 아래로 이동
   const scrollToBottom = () => {
@@ -57,15 +61,11 @@ export default function ChatRoomPage() {
     }
   };
 
-  // 메시지 로드
-  const loadMessages = async () => {
-    try {
-      const roomMessages = await authService.fetchChatMessages(roomId);
-      setMessages(roomMessages);
-    } catch (err: unknown) {
-      console.error('메시지 로드 실패:', err);
-    }
-  };
+  // 알림 초기화
+  useEffect(() => {
+    notificationService.init();
+    notificationService.requestPermission();
+  }, []);
 
   // 메시지 전송
   const handleSendMessage = async (content: string) => {
@@ -73,8 +73,7 @@ export default function ChatRoomPage() {
     
     try {
       await authService.sendMessage(roomId, userProfile.id, content);
-      // 메시지 목록 새로고침
-      await loadMessages();
+      // 실시간 훅이 자동으로 업데이트하므로 별도 로드 불필요
     } catch (err: unknown) {
       console.error('메시지 전송 실패:', err);
     }
@@ -109,7 +108,6 @@ export default function ChatRoomPage() {
   useEffect(() => {
     if (roomId) {
       loadChatRoom();
-      loadMessages();
     }
   }, [roomId, userProfile]);
 
@@ -117,7 +115,7 @@ export default function ChatRoomPage() {
     scrollToBottom();
   }, [messages]);
 
-  if (loading) {
+  if (loading || messagesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
         <LoadingSpinner />
@@ -125,12 +123,12 @@ export default function ChatRoomPage() {
     );
   }
 
-  if (error) {
+  if (error || messagesError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-white mb-4">오류 발생</h2>
-          <p className="text-white/80 mb-6">{error}</p>
+          <p className="text-white/80 mb-6">{error || messagesError}</p>
           <button
             onClick={() => router.push('/')}
             className="px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors"
