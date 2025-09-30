@@ -7,7 +7,7 @@ frontend:
         - npm ci
     build:
       commands:
-        - echo "Building the app..."
+        - echo "Building Next.js application..."
         - npm run build
   artifacts:
     baseDirectory: .next
@@ -17,4 +17,3 @@ frontend:
     paths:
       - node_modules/**/*
       - .next/cache/**/*
-      - .next/static/**/*
