@@ -9,8 +9,9 @@ frontend:
       commands:
         - echo "Building Next.js application..."
         - npm run build
+        - npm run export
   artifacts:
-    baseDirectory: .next
+    baseDirectory: out
     files:
       - '**/*'
   cache:
