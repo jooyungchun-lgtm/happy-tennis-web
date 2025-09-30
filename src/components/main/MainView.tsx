@@ -123,7 +123,8 @@ const MainView: React.FC = () => {
             {activeChatRooms.map((room) => (
               <div
                 key={room.id}
-                className="flex-shrink-0 bg-white/10 backdrop-blur-lg rounded-xl p-4 min-w-[200px] border border-white/20"
+                onClick={() => window.location.href = `/chat/${room.id}`}
+                className="flex-shrink-0 bg-white/10 backdrop-blur-lg rounded-xl p-4 min-w-[200px] border border-white/20 cursor-pointer hover:bg-white/20 transition-colors"
               >
                 <h3 className="font-semibold text-white text-sm">
                   {room.courtName} {room.courtNumber}번

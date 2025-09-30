@@ -17,7 +17,10 @@ import {
   getDocs,
   updateDoc,
   collectionGroup,
-  Timestamp
+  Timestamp,
+  orderBy,
+  serverTimestamp,
+  deleteDoc
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { UserProfile, Membership, ChatRoom, ChatMessage } from '@/types/models';
@@ -304,6 +307,77 @@ export class AuthService {
       });
     } catch (error) {
       console.error('Send message error:', error);
+      throw error;
+    }
+  }
+
+  // 간단한 메시지 전송 (문자열만 받음)
+  async sendMessage(roomId: string, senderId: string, content: string): Promise<void> {
+    try {
+      // 사용자 프로필 가져오기
+      const userProfile = await this.fetchUserProfile(senderId);
+      if (!userProfile) {
+        throw new Error('사용자 프로필을 찾을 수 없습니다.');
+      }
+
+      // 참여 중인지 확인
+      if (!(await this.isUserParticipating(roomId, senderId))) {
+        throw new Error('채팅방에 참여하지 않은 사용자입니다.');
+      }
+
+      // 메시지 저장
+      const messagesRef = collection(db, 'chatRooms', roomId, 'messages');
+      await addDoc(messagesRef, {
+        senderId: senderId,
+        senderName: userProfile.name,
+        content: content,
+        timestamp: serverTimestamp(),
+        messageType: 'text'
+      });
+    } catch (error) {
+      console.error('Send message error:', error);
+      throw error;
+    }
+  }
+
+  // 채팅방 정보 가져오기
+  async fetchChatRoom(roomId: string): Promise<ChatRoom | null> {
+    try {
+      const roomDoc = await getDoc(doc(db, 'chatRooms', roomId));
+      if (!roomDoc.exists()) {
+        return null;
+      }
+      return this.decodeChatRoom(roomId, roomDoc.data());
+    } catch (error) {
+      console.error('Fetch chat room error:', error);
+      throw error;
+    }
+  }
+
+  // 채팅 메시지 가져오기
+  async fetchChatMessages(roomId: string): Promise<ChatMessage[]> {
+    try {
+      const messagesRef = collection(db, 'chatRooms', roomId, 'messages');
+      const messagesSnapshot = await getDocs(
+        query(messagesRef, orderBy('timestamp', 'asc'))
+      );
+      
+      return messagesSnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          roomId: roomId,
+          senderId: data.senderId,
+          senderName: data.senderName,
+          content: data.content,
+          timestamp: data.timestamp instanceof Timestamp 
+            ? data.timestamp.toDate() 
+            : new Date(),
+          messageType: data.messageType || 'text'
+        };
+      });
+    } catch (error) {
+      console.error('Fetch chat messages error:', error);
       throw error;
     }
   }
