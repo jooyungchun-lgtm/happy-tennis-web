@@ -263,6 +263,17 @@ export class AuthService {
     }
   }
 
+  // 채팅방 나가기
+  async leaveChatRoom(roomId: string, userId: string): Promise<void> {
+    try {
+      const participantRef = doc(db, 'chatRooms', roomId, 'participants', userId);
+      await deleteDoc(participantRef);
+    } catch (error) {
+      console.error('Leave chat room error:', error);
+      throw error;
+    }
+  }
+
   // 사용자 멤버십 조회
   async fetchUserMemberships(userId: string): Promise<Record<string, Membership>> {
     try {
@@ -295,43 +306,20 @@ export class AuthService {
   }
 
   // 메시지 전송
-  async sendMessage(roomId: string, message: ChatMessage): Promise<void> {
-    try {
-      const messagesRef = collection(db, 'chatRooms', roomId, 'messages');
-      await addDoc(messagesRef, {
-        senderId: message.senderId,
-        senderName: message.senderName,
-        content: message.content,
-        timestamp: message.timestamp,
-        messageType: message.messageType
-      });
-    } catch (error) {
-      console.error('Send message error:', error);
-      throw error;
-    }
-  }
-
-  // 간단한 메시지 전송 (문자열만 받음)
   async sendMessage(roomId: string, senderId: string, content: string): Promise<void> {
     try {
-      // 사용자 프로필 가져오기
-      const userProfile = await this.fetchUserProfile(senderId);
+      // 사용자 프로필에서 이름 가져오기
+      const userProfile = await this.loadUserProfile(senderId);
       if (!userProfile) {
         throw new Error('사용자 프로필을 찾을 수 없습니다.');
       }
 
-      // 참여 중인지 확인
-      if (!(await this.isUserParticipating(roomId, senderId))) {
-        throw new Error('채팅방에 참여하지 않은 사용자입니다.');
-      }
-
-      // 메시지 저장
       const messagesRef = collection(db, 'chatRooms', roomId, 'messages');
       await addDoc(messagesRef, {
         senderId: senderId,
         senderName: userProfile.name,
         content: content,
-        timestamp: serverTimestamp(),
+        timestamp: new Date(),
         messageType: 'text'
       });
     } catch (error) {

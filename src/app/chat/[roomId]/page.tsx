@@ -8,11 +8,16 @@ import { ChatMessage, ChatRoom } from '@/types/models';
 import { ArrowLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import ChatMessageComponent from '@/components/chat/ChatMessageComponent';
 import ChatInput from '@/components/chat/ChatInput';
-import LoadingSpinner from '@/components/shared/LoadingSpinner';
+// LoadingSpinner 컴포넌트를 인라인으로 정의
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+  </div>
+);
 import { useRealtimeChat } from '@/hooks/useRealtimeChat';
 import { notificationService } from '@/lib/notifications';
 
-const authService = new AuthService();
+const authService = AuthService.getInstance();
 
 export default function ChatRoomPage() {
   const params = useParams();
@@ -84,11 +89,12 @@ export default function ChatRoomPage() {
     if (!userProfile) return;
     
     try {
-      await authService.joinChatRoom(roomId, userProfile.id);
+      await authService.joinChatRoom(roomId, userProfile);
       setIsParticipating(true);
       await loadChatRoom();
     } catch (err: unknown) {
       console.error('채팅방 참여 실패:', err);
+      setError(err instanceof Error ? err.message : '채팅방 참여에 실패했습니다.');
     }
   };
 
@@ -102,6 +108,7 @@ export default function ChatRoomPage() {
       router.push('/');
     } catch (err: unknown) {
       console.error('채팅방 나가기 실패:', err);
+      setError(err instanceof Error ? err.message : '채팅방 나가기에 실패했습니다.');
     }
   };
 
