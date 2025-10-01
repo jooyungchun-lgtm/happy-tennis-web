@@ -220,32 +220,44 @@ export class AuthService {
   // 채팅방 참여
   async joinChatRoom(roomId: string, userProfile: UserProfile): Promise<void> {
     try {
+      console.log('Attempting to join chat room:', { roomId, userId: userProfile.id });
+      
       // 차단된 사용자인지 확인
       if (await this.isUserBanned(roomId, userProfile.id)) {
+        console.log('User is banned from room:', roomId);
         throw new Error('이 채팅방에서 영구 추방되어 입장할 수 없습니다.');
       }
 
       // 이미 참여 중인지 확인
       if (await this.isUserParticipating(roomId, userProfile.id)) {
+        console.log('User is already participating in room:', roomId);
         throw new Error('이미 참여 중인 채팅방입니다.');
       }
 
       // 인원 제한 확인
+      console.log('Checking room capacity...');
       const roomDoc = await getDoc(doc(db, 'chatRooms', roomId));
       if (!roomDoc.exists()) {
+        console.log('Room does not exist:', roomId);
         throw new Error('채팅방 정보를 찾을 수 없습니다.');
       }
 
       const roomData = roomDoc.data();
+      console.log('Room data:', roomData);
+      
       const maxParticipants = roomData.maleCount + roomData.femaleCount;
       const currentCounts = await this.participantCounts(roomId);
       const currentTotal = currentCounts.male + currentCounts.female;
 
+      console.log('Participant counts:', { maxParticipants, currentTotal, currentCounts });
+
       if (currentTotal >= maxParticipants) {
+        console.log('Room is full:', { currentTotal, maxParticipants });
         throw new Error('인원이 가득찼습니다.');
       }
 
       // 참여자 추가
+      console.log('Adding participant to room...');
       const participantRef = doc(db, 'chatRooms', roomId, 'participants', userProfile.id);
       await setDoc(participantRef, {
         id: userProfile.id,
@@ -259,6 +271,8 @@ export class AuthService {
         ageGroup: userProfile.ageGroup,
         homeCourt: userProfile.homeCourt
       });
+      
+      console.log('Successfully joined chat room:', roomId);
     } catch (error) {
       console.error('Join chat room error:', error);
       throw error;

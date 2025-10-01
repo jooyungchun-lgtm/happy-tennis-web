@@ -78,10 +78,20 @@ const MainView: React.FC = () => {
     if (!userProfile || !room.id) return;
 
     try {
+      console.log('Attempting to join room from main view:', { roomId: room.id, userId: userProfile.id });
       await authService.joinChatRoom(room.id, userProfile);
       await loadData(); // 데이터 새로고침
+      console.log('Successfully joined room from main view');
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : '채팅방 참여에 실패했습니다.');
+      const errorMessage = err instanceof Error ? err.message : '채팅방 참여에 실패했습니다.';
+      console.error('Join room error:', errorMessage);
+      
+      // 이미 참여 중인 경우에는 에러를 표시하지 않고 데이터 새로고침
+      if (errorMessage.includes('이미 참여 중인 채팅방')) {
+        await loadData();
+      } else {
+        setError(errorMessage);
+      }
     }
   };
 

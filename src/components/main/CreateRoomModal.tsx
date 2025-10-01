@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { authService } from '@/lib/auth';
 import { CreateRoomForm, ChatRoom } from '@/types/models';
@@ -18,6 +19,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
   onClose,
   onRoomCreated
 }) => {
+  const router = useRouter();
   const { userProfile } = useAuth();
   const [formData, setFormData] = useState<CreateRoomForm>({
     courtName: '',
@@ -65,9 +67,14 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         isFinished: false
       };
 
-      await authService.createChatRoom(room, userProfile);
+      const roomId = await authService.createChatRoom(room, userProfile);
+      console.log('Chat room created with ID:', roomId);
+      
       onRoomCreated();
       onClose();
+      
+      // 생성된 채팅방으로 자동 이동
+      router.push(`/chat/${roomId}`);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : '채팅방 생성에 실패했습니다.');
     } finally {

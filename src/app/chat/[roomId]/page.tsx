@@ -91,12 +91,21 @@ export default function ChatRoomPage() {
     if (!userProfile) return;
     
     try {
+      console.log('Attempting to join room from chat page:', { roomId, userId: userProfile.id });
       await authService.joinChatRoom(roomId, userProfile);
       setIsParticipating(true);
       await loadChatRoom();
+      console.log('Successfully joined room from chat page');
     } catch (err: unknown) {
       console.error('채팅방 참여 실패:', err);
-      setError(err instanceof Error ? err.message : '채팅방 참여에 실패했습니다.');
+      const errorMessage = err instanceof Error ? err.message : '채팅방 참여에 실패했습니다.';
+      setError(errorMessage);
+      
+      // 이미 참여 중인 경우에는 에러를 표시하지 않고 참여 상태를 업데이트
+      if (errorMessage.includes('이미 참여 중인 채팅방')) {
+        setIsParticipating(true);
+        await loadChatRoom();
+      }
     }
   };
 
