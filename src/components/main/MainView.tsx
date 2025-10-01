@@ -7,11 +7,13 @@ import { ChatRoom, Membership } from '@/types/models';
 import { formatDate, formatTime, getTimeUntil } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import SearchAndFilter from './SearchAndFilter';
+import TennisCourtsAdmin from '@/components/admin/TennisCourtsAdmin';
 import { ChatRoomSkeleton } from '@/components/shared/SkeletonLoader';
 import { 
   CircleStackIcon,
   ExclamationTriangleIcon,
-  PlusIcon
+  PlusIcon,
+  Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 
 const MainView: React.FC = () => {
@@ -23,6 +25,7 @@ const MainView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [activeChatRooms, setActiveChatRooms] = useState<ChatRoom[]>([]);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -133,6 +136,22 @@ const MainView: React.FC = () => {
 
   return (
     <div className="flex-1 overflow-hidden">
+      {/* 관리자 패널 버튼 */}
+      <div className="p-4 border-b border-white/10">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-white">테니스 채팅방</h1>
+          <Button
+            onClick={() => setShowAdminPanel(true)}
+            variant="outline"
+            size="sm"
+            className="flex items-center space-x-2"
+          >
+            <Cog6ToothIcon className="h-4 w-4" />
+            <span>테니스장 관리</span>
+          </Button>
+        </div>
+      </div>
+
       {/* 검색 및 필터링 */}
       <SearchAndFilter 
         chatRooms={chatRooms} 
@@ -256,6 +275,12 @@ const MainView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* 관리자 패널 */}
+      <TennisCourtsAdmin
+        isOpen={showAdminPanel}
+        onClose={() => setShowAdminPanel(false)}
+      />
     </div>
   );
 };
