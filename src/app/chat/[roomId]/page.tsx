@@ -287,6 +287,8 @@ export default function ChatRoomPage() {
                 key={message.id}
                 message={message}
                 isOwn={message.senderId === userProfile?.id}
+                currentUserId={userProfile?.id || ''}
+                roomId={roomId}
               />
             ))
           )}

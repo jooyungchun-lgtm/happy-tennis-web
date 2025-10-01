@@ -25,6 +25,7 @@ import {
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { UserProfile, Membership, ChatRoom, ChatMessage } from '@/types/models';
+import { moderationService } from './moderation';
 
 export class AuthService {
   private static instance: AuthService;
@@ -315,11 +316,18 @@ export class AuthService {
         throw new Error('사용자 프로필을 찾을 수 없습니다.');
       }
 
+      // 메시지 필터링
+      const moderationResult = moderationService.filterMessage(content);
+      
+      if (!moderationResult.isClean) {
+        throw new Error('부적절한 내용이 포함되어 있습니다. 메시지를 수정해주세요.');
+      }
+
       const messagesRef = collection(db, 'chatRooms', roomId, 'messages');
       await addDoc(messagesRef, {
         senderId: senderId,
         senderName: userProfile.name,
-        content: content,
+        content: moderationResult.filteredContent,
         timestamp: new Date(),
         messageType: 'text'
       });
