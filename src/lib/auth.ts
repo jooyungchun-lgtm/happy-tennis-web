@@ -20,7 +20,8 @@ import {
   Timestamp,
   orderBy,
   serverTimestamp,
-  deleteDoc
+  deleteDoc,
+  writeBatch
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { UserProfile, Membership, ChatRoom, ChatMessage } from '@/types/models';
@@ -324,6 +325,113 @@ export class AuthService {
       });
     } catch (error) {
       console.error('Send message error:', error);
+      throw error;
+    }
+  }
+
+  // 채팅방 삭제 (호스트만 가능)
+  async deleteChatRoom(roomId: string, userId: string): Promise<void> {
+    try {
+      const roomDoc = await getDoc(doc(db, 'chatRooms', roomId));
+      if (!roomDoc.exists()) {
+        throw new Error('채팅방을 찾을 수 없습니다.');
+      }
+
+      const roomData = roomDoc.data();
+      if (roomData.hostId !== userId) {
+        throw new Error('채팅방을 삭제할 권한이 없습니다.');
+      }
+
+      // 채팅방과 관련된 모든 하위 컬렉션 삭제
+      const batch = writeBatch(db);
+      
+      // 참여자들 삭제
+      const participantsSnapshot = await getDocs(collection(db, 'chatRooms', roomId, 'participants'));
+      participantsSnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      // 메시지들 삭제
+      const messagesSnapshot = await getDocs(collection(db, 'chatRooms', roomId, 'messages'));
+      messagesSnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+
+      // 채팅방 자체 삭제
+      batch.delete(doc(db, 'chatRooms', roomId));
+
+      await batch.commit();
+    } catch (error) {
+      console.error('Delete chat room error:', error);
+      throw error;
+    }
+  }
+
+  // 채팅방 마감 처리
+  async closeChatRoom(roomId: string, userId: string): Promise<void> {
+    try {
+      const roomDoc = await getDoc(doc(db, 'chatRooms', roomId));
+      if (!roomDoc.exists()) {
+        throw new Error('채팅방을 찾을 수 없습니다.');
+      }
+
+      const roomData = roomDoc.data();
+      if (roomData.hostId !== userId) {
+        throw new Error('채팅방을 마감할 권한이 없습니다.');
+      }
+
+      await updateDoc(doc(db, 'chatRooms', roomId), {
+        status: '마감',
+        isClosed: true
+      });
+    } catch (error) {
+      console.error('Close chat room error:', error);
+      throw error;
+    }
+  }
+
+  // 참여자 목록 가져오기
+  async getParticipants(roomId: string): Promise<any[]> {
+    try {
+      const participantsSnapshot = await getDocs(collection(db, 'chatRooms', roomId, 'participants'));
+      return participantsSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('Get participants error:', error);
+      throw error;
+    }
+  }
+
+  // 참여자 승인
+  async confirmParticipant(roomId: string, participantId: string): Promise<void> {
+    try {
+      await updateDoc(doc(db, 'chatRooms', roomId, 'participants', participantId), {
+        isConfirmed: true
+      });
+    } catch (error) {
+      console.error('Confirm participant error:', error);
+      throw error;
+    }
+  }
+
+  // 참여자 거부
+  async rejectParticipant(roomId: string, participantId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db, 'chatRooms', roomId, 'participants', participantId));
+    } catch (error) {
+      console.error('Reject participant error:', error);
+      throw error;
+    }
+  }
+
+  // 참여자 추방
+  async kickParticipant(roomId: string, participantId: string): Promise<void> {
+    try {
+      await deleteDoc(doc(db, 'chatRooms', roomId, 'participants', participantId));
+    } catch (error) {
+      console.error('Kick participant error:', error);
       throw error;
     }
   }
