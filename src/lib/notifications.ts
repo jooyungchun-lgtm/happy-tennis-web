@@ -78,6 +78,60 @@ export class NotificationService {
     return this.permission;
   }
 
+  // 채팅방 참여자 변경 알림
+  showParticipantChangeNotification(changeType: 'joined' | 'left' | 'kicked', participantName: string, roomName: string) {
+    if (this.permission !== 'granted') return;
+
+    const messages = {
+      joined: `${participantName}님이 ${roomName}에 참여했습니다.`,
+      left: `${participantName}님이 ${roomName}에서 나갔습니다.`,
+      kicked: `${participantName}님이 ${roomName}에서 추방되었습니다.`
+    };
+
+    const notification = new Notification('참여자 변경', {
+      body: messages[changeType],
+      icon: '/icon-192.png',
+      tag: 'participant-change',
+      requireInteraction: false
+    });
+
+    setTimeout(() => {
+      notification.close();
+    }, 4000);
+  }
+
+  // 채팅방 마감 알림
+  showRoomClosedNotification(roomName: string) {
+    if (this.permission !== 'granted') return;
+
+    const notification = new Notification('채팅방 마감', {
+      body: `${roomName}이 마감되었습니다.`,
+      icon: '/icon-192.png',
+      tag: 'room-closed',
+      requireInteraction: true
+    });
+
+    setTimeout(() => {
+      notification.close();
+    }, 5000);
+  }
+
+  // 경기 일정 알림
+  showGameReminderNotification(roomName: string, timeUntil: string) {
+    if (this.permission !== 'granted') return;
+
+    const notification = new Notification('경기 일정 알림', {
+      body: `${roomName} 경기가 ${timeUntil} 후에 시작됩니다.`,
+      icon: '/icon-192.png',
+      tag: 'game-reminder',
+      requireInteraction: false
+    });
+
+    setTimeout(() => {
+      notification.close();
+    }, 6000);
+  }
+
   // 알림 설정 초기화
   init() {
     if ('Notification' in window) {

@@ -13,10 +13,13 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedNtrp, setSelectedNtrp] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedGameType, setSelectedGameType] = useState<string>('');
   const [showFilters, setShowFilters] = useState(false);
 
   const ntrpLevels = ['1.0', '1.5', '2.0', '2.5', '3.0', '3.5', '4.0', '4.5', '5.0'];
   const regions = ['서울', '경기', '인천', '부산', '대구', '광주', '대전', '울산', '세종', '강원', '충북', '충남', '전북', '전남', '경북', '경남', '제주'];
+  const gameTypes = ['남자 단식', '여자 단식', '남자 복식', '여자 복식', '혼합 복식'];
 
   // 필터링 로직
   const applyFilters = () => {
@@ -43,6 +46,20 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
       );
     }
 
+    // 날짜 필터
+    if (selectedDate) {
+      const selectedDateObj = new Date(selectedDate);
+      filtered = filtered.filter(room => {
+        const roomDate = new Date(room.date);
+        return roomDate.toDateString() === selectedDateObj.toDateString();
+      });
+    }
+
+    // 게임 타입 필터
+    if (selectedGameType) {
+      filtered = filtered.filter(room => room.gameType === selectedGameType);
+    }
+
     onFilteredRooms(filtered);
   };
 
@@ -51,6 +68,8 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
     setSearchTerm('');
     setSelectedNtrp('');
     setSelectedRegion('');
+    setSelectedDate('');
+    setSelectedGameType('');
     onFilteredRooms(chatRooms);
   };
 
@@ -127,6 +146,42 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
               <option value="">전체</option>
               {regions.map(region => (
                 <option key={region} value={region}>{region}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* 날짜 필터 */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">
+              날짜
+            </label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+                applyFilters();
+              }}
+              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          </div>
+
+          {/* 게임 타입 필터 */}
+          <div>
+            <label className="block text-sm font-medium text-white/80 mb-2">
+              게임 타입
+            </label>
+            <select
+              value={selectedGameType}
+              onChange={(e) => {
+                setSelectedGameType(e.target.value);
+                applyFilters();
+              }}
+              className="w-full px-3 py-2 bg-white/10 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            >
+              <option value="">전체</option>
+              {gameTypes.map(gameType => (
+                <option key={gameType} value={gameType}>{gameType}</option>
               ))}
             </select>
           </div>

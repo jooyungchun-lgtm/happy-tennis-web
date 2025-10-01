@@ -7,6 +7,7 @@ import { ChatRoom, Membership } from '@/types/models';
 import { formatDate, formatTime, getTimeUntil } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 import SearchAndFilter from './SearchAndFilter';
+import { ChatRoomSkeleton } from '@/components/shared/SkeletonLoader';
 import { 
   CircleStackIcon,
   ExclamationTriangleIcon,
@@ -95,8 +96,12 @@ const MainView: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
+      <div className="flex-1 overflow-hidden">
+        <div className="p-4 space-y-4">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <ChatRoomSkeleton key={index} />
+          ))}
+        </div>
       </div>
     );
   }
