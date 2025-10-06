@@ -115,7 +115,7 @@ export class ModerationService {
   }
 
   // 신고된 콘텐츠 조회
-  async getReports(): Promise<any[]> {
+  async getReports(): Promise<Record<string, unknown>[]> {
     try {
       // 신고 목록 조회 로직
       return [];

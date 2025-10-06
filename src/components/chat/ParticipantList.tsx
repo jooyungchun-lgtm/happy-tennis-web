@@ -25,14 +25,13 @@ interface Participant {
 
 interface ParticipantListProps {
   roomId: string;
-  currentUserId: string;
   isHost: boolean;
   onParticipantUpdate: () => void;
 }
 
 const authService = AuthService.getInstance();
 
-export default function ParticipantList({ roomId, currentUserId, isHost, onParticipantUpdate }: ParticipantListProps) {
+export default function ParticipantList({ roomId, isHost, onParticipantUpdate }: ParticipantListProps) {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

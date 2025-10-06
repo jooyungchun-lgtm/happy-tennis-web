@@ -194,7 +194,7 @@ class GoogleSheetsService {
   }
 
   // 시트 정보 가져오기
-  public async getSheetInfo(): Promise<any> {
+  public async getSheetInfo(): Promise<Record<string, unknown>> {
     try {
       if (!this.sheets) {
         await this.initializeSheets();
