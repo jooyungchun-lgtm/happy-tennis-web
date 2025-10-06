@@ -313,7 +313,6 @@ export default function ChatRoomPage() {
           /* 참여자 목록 */
           <ParticipantList
             roomId={roomId}
-            currentUserId={userProfile?.id || ''}
             isHost={userProfile?.id === chatRoom?.hostId}
             onParticipantUpdate={loadChatRoom}
           />
