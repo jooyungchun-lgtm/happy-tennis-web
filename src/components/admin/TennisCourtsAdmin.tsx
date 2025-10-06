@@ -2,14 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { tennisCourtsService, TennisCourt } from '@/lib/tennisCourts';
-import { googleSheetsService } from '@/lib/googleSheets';
 import Button from '@/components/ui/Button';
 import { 
   ArrowPathIcon, 
   PlusIcon, 
   PencilIcon, 
   TrashIcon,
-  ExternalLinkIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
@@ -57,9 +55,9 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
     }
   };
 
-  const syncWithGoogleSheets = async () => {
+  const syncWithAPI = async () => {
     setLoading(true);
-    setSyncStatus('구글 시트와 동기화 중...');
+    setSyncStatus('API에서 데이터 동기화 중...');
     
     try {
       const response = await fetch('/api/tennis-courts');
@@ -67,21 +65,21 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
       
       if (result.success && result.data.length > 0) {
         setCourts(result.data);
-        setSyncStatus(`구글 시트에서 ${result.data.length}개 데이터 동기화 완료`);
+        setSyncStatus(`API에서 ${result.data.length}개 데이터 동기화 완료`);
       } else {
-        setSyncStatus('구글 시트에서 데이터를 찾을 수 없습니다');
+        setSyncStatus('API에서 데이터를 찾을 수 없습니다');
       }
     } catch (error) {
-      console.error('구글 시트 동기화 실패:', error);
-      setSyncStatus('구글 시트 동기화 실패');
+      console.error('API 동기화 실패:', error);
+      setSyncStatus('API 동기화 실패');
     } finally {
       setLoading(false);
     }
   };
 
-  const uploadToGoogleSheets = async () => {
+  const uploadToAPI = async () => {
     setLoading(true);
-    setSyncStatus('구글 시트에 업로드 중...');
+    setSyncStatus('API에 업로드 중...');
     
     try {
       const response = await fetch('/api/tennis-courts', {
@@ -97,11 +95,11 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
       if (result.success) {
         setSyncStatus(result.message);
       } else {
-        setSyncStatus(result.error || '구글 시트 업로드 실패');
+        setSyncStatus(result.error || 'API 업로드 실패');
       }
     } catch (error) {
-      console.error('구글 시트 업로드 실패:', error);
-      setSyncStatus('구글 시트 업로드 실패');
+      console.error('API 업로드 실패:', error);
+      setSyncStatus('API 업로드 실패');
     } finally {
       setLoading(false);
     }
@@ -152,8 +150,9 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
     }
   };
 
-  const openGoogleSheets = () => {
-    window.open(googleSheetsService.getSheetUrl(), '_blank');
+  const openDataManagement = () => {
+    // 데이터 관리 페이지로 이동하거나 모달 표시
+    alert('데이터 관리 기능은 추후 구현 예정입니다.');
   };
 
   if (!isOpen) return null;
@@ -176,31 +175,31 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-4">
               <Button
-                onClick={syncWithGoogleSheets}
+                onClick={syncWithAPI}
                 loading={loading}
                 className="flex items-center space-x-2"
               >
                 <ArrowPathIcon className="h-4 w-4" />
-                <span>구글 시트에서 가져오기</span>
+                <span>API에서 가져오기</span>
               </Button>
               
               <Button
-                onClick={uploadToGoogleSheets}
+                onClick={uploadToAPI}
                 loading={loading}
                 variant="outline"
                 className="flex items-center space-x-2"
               >
                 <ArrowPathIcon className="h-4 w-4" />
-                <span>구글 시트에 업로드</span>
+                <span>API에 업로드</span>
               </Button>
               
               <Button
-                onClick={openGoogleSheets}
+                onClick={openDataManagement}
                 variant="outline"
                 className="flex items-center space-x-2"
               >
-                <ExternalLinkIcon className="h-4 w-4" />
-                <span>구글 시트 열기</span>
+                <InformationCircleIcon className="h-4 w-4" />
+                <span>데이터 관리</span>
               </Button>
             </div>
             

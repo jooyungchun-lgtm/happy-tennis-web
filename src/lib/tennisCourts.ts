@@ -1,7 +1,5 @@
 // 서울특별시 공공서비스예약 테니스장 데이터 관리
 
-import { googleSheetsService } from './googleSheets';
-
 export interface TennisCourt {
   facility_name: string;
   region: string;
@@ -44,24 +42,15 @@ class TennisCourtsService {
 
   private async loadCourtsData(): Promise<void> {
     try {
-      // 먼저 구글 시트에서 데이터 로드 시도
-      const googleSheetsData = await googleSheetsService.readTennisCourts();
-      
-      if (googleSheetsData.length > 0) {
-        this.courts = googleSheetsData;
-        this.lastSyncTime = new Date();
-        console.log('구글 시트에서 테니스장 데이터를 로드했습니다.');
+      // 클라이언트 사이드에서는 로컬 JSON 파일 사용
+      const response = await fetch('/data/seoul_tennis_courts.json');
+      if (response.ok) {
+        this.courts = await response.json();
+        console.log('로컬 JSON 파일에서 테니스장 데이터를 로드했습니다.');
       } else {
-        // 구글 시트에서 데이터를 가져올 수 없으면 로컬 JSON 파일 사용
-        const response = await fetch('/data/seoul_tennis_courts.json');
-        if (response.ok) {
-          this.courts = await response.json();
-          console.log('로컬 JSON 파일에서 테니스장 데이터를 로드했습니다.');
-        } else {
-          // 폴백 데이터 (기본 테니스장들)
-          this.courts = this.getFallbackCourts();
-          console.log('폴백 데이터를 사용합니다.');
-        }
+        // 폴백 데이터 (기본 테니스장들)
+        this.courts = this.getFallbackCourts();
+        console.log('폴백 데이터를 사용합니다.');
       }
       
       this.organizeFacilities();
@@ -74,16 +63,11 @@ class TennisCourtsService {
 
   // 주기적 동기화 시작
   private startPeriodicSync(): void {
-    // 1시간마다 구글 시트와 동기화
+    // 1시간마다 로컬 데이터 새로고침
     setInterval(async () => {
       try {
-        const googleSheetsData = await googleSheetsService.readTennisCourts();
-        if (googleSheetsData.length > 0) {
-          this.courts = googleSheetsData;
-          this.lastSyncTime = new Date();
-          this.organizeFacilities();
-          console.log('구글 시트와 동기화 완료');
-        }
+        await this.loadCourtsData();
+        console.log('데이터 새로고침 완료');
       } catch (error) {
         console.error('주기적 동기화 실패:', error);
       }
