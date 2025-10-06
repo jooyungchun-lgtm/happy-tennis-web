@@ -11,7 +11,7 @@ interface GoogleSheetsConfig {
 
 class GoogleSheetsService {
   private static instance: GoogleSheetsService;
-  private sheets: unknown;
+  private sheets: any;
   private config: GoogleSheetsConfig;
 
   private constructor() {
