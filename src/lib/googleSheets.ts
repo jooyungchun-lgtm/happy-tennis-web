@@ -74,7 +74,9 @@ class GoogleSheetsService {
       const dataRows = rows.slice(1);
       
       const tennisCourts: TennisCourt[] = dataRows
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .filter((row: any) => row.length >= 6) // 최소 필요한 컬럼이 있는지 확인
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map((row: any) => ({
           facility_name: row[0] || '',
           region: row[1] || '',
