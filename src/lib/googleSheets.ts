@@ -6,12 +6,12 @@ import { TennisCourt } from './tennisCourts';
 interface GoogleSheetsConfig {
   spreadsheetId: string;
   range: string;
-  credentials?: any;
+  credentials?: Record<string, unknown>;
 }
 
 class GoogleSheetsService {
   private static instance: GoogleSheetsService;
-  private sheets: any;
+  private sheets: unknown;
   private config: GoogleSheetsConfig;
 
   private constructor() {
@@ -74,7 +74,7 @@ class GoogleSheetsService {
       
       const tennisCourts: TennisCourt[] = dataRows
         .filter(row => row.length >= 6) // 최소 필요한 컬럼이 있는지 확인
-        .map((row, index) => ({
+        .map((row) => ({
           facility_name: row[0] || '',
           region: row[1] || '',
           court_number: row[4] || '',
@@ -206,7 +206,7 @@ class GoogleSheetsService {
 
       return {
         title: response.data.properties.title,
-        sheets: response.data.sheets.map((sheet: any) => ({
+        sheets: response.data.sheets.map((sheet: Record<string, unknown>) => ({
           title: sheet.properties.title,
           rowCount: sheet.properties.gridProperties.rowCount,
           columnCount: sheet.properties.gridProperties.columnCount,

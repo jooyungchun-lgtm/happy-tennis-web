@@ -7,7 +7,6 @@ import {
   ArrowPathIcon, 
   PlusIcon, 
   PencilIcon, 
-  TrashIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
@@ -21,7 +20,7 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
   const [loading, setLoading] = useState(false);
   const [syncStatus, setSyncStatus] = useState<string>('');
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingCourt, setEditingCourt] = useState<TennisCourt | null>(null);
+  const [editingCourt] = useState<TennisCourt | null>(null);
   const [newCourt, setNewCourt] = useState<Partial<TennisCourt>>({
     facility_name: '',
     region: '',

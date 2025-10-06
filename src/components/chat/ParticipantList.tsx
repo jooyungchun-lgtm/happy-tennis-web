@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AuthService } from '@/lib/auth';
-import { UserProfile } from '@/types/models';
+// import { UserProfile } from '@/types/models';
 import { 
   UserIcon, 
   CheckIcon, 
@@ -37,7 +37,7 @@ export default function ParticipantList({ roomId, currentUserId, isHost, onParti
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadParticipants = async () => {
+  const loadParticipants = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -49,7 +49,7 @@ export default function ParticipantList({ roomId, currentUserId, isHost, onParti
     } finally {
       setLoading(false);
     }
-  };
+  }, [roomId]);
 
   const handleConfirmParticipant = async (participantId: string) => {
     try {
@@ -87,7 +87,7 @@ export default function ParticipantList({ roomId, currentUserId, isHost, onParti
 
   useEffect(() => {
     loadParticipants();
-  }, [roomId]);
+  }, [roomId, loadParticipants]);
 
   if (loading) {
     return (

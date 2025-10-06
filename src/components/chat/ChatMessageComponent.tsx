@@ -5,7 +5,7 @@ import { ChatMessage } from '@/types/models';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { moderationService } from '@/lib/moderation';
-import { ExclamationTriangleIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
+import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 interface ChatMessageComponentProps {
   message: ChatMessage;

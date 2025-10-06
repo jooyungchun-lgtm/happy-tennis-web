@@ -87,7 +87,7 @@ export class ModerationService {
   }
 
   // 관리자 알림
-  private notifyAdmins(report: any): void {
+  private notifyAdmins(report: Record<string, unknown>): void {
     // 실제 구현에서는 관리자 대시보드나 알림 시스템에 전송
     console.log('Admin notification:', report);
   }

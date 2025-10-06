@@ -1,11 +1,11 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthService } from '@/lib/auth';
-import { ChatMessage, ChatRoom } from '@/types/models';
-import { ArrowLeftIcon, PaperAirplaneIcon } from '@heroicons/react/24/outline';
+import { ChatRoom } from '@/types/models';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import ChatMessageComponent from '@/components/chat/ChatMessageComponent';
 import ChatInput from '@/components/chat/ChatInput';
 import ParticipantList from '@/components/chat/ParticipantList';
@@ -43,7 +43,7 @@ export default function ChatRoomPage() {
   };
 
   // 채팅방 정보 로드
-  const loadChatRoom = async () => {
+  const loadChatRoom = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -66,7 +66,7 @@ export default function ChatRoomPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [roomId, userProfile]);
 
   // 알림 초기화
   useEffect(() => {
@@ -157,7 +157,7 @@ export default function ChatRoomPage() {
     if (roomId) {
       loadChatRoom();
     }
-  }, [roomId, userProfile]);
+  }, [roomId, userProfile, loadChatRoom]);
 
   useEffect(() => {
     scrollToBottom();

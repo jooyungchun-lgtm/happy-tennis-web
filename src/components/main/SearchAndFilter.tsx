@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { ChatRoom } from '@/types/models';
 
@@ -22,7 +22,7 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
   const gameTypes = ['남자 단식', '여자 단식', '남자 복식', '여자 복식', '혼합 복식'];
 
   // 필터링 로직
-  const applyFilters = () => {
+  const applyFilters = useCallback(() => {
     let filtered = chatRooms;
 
     // 검색어 필터
@@ -61,7 +61,7 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
     }
 
     onFilteredRooms(filtered);
-  };
+  }, [searchTerm, selectedNtrp, selectedRegion, selectedDate, selectedGameType, chatRooms, onFilteredRooms]);
 
   // 필터 초기화
   const resetFilters = () => {
@@ -76,7 +76,7 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
   // 필터 변경 시 자동 적용
   useEffect(() => {
     applyFilters();
-  }, [searchTerm, selectedNtrp, selectedRegion, selectedDate, selectedGameType, chatRooms]);
+  }, [searchTerm, selectedNtrp, selectedRegion, selectedDate, selectedGameType, chatRooms, applyFilters]);
 
   return (
     <div className="bg-white/5 border-b border-white/10 p-4">

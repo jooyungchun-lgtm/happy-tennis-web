@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authService } from '@/lib/auth';
 import { ChatRoom, Membership } from '@/types/models';
@@ -18,7 +18,7 @@ const ChatView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
 
-  const loadActiveChatRooms = async () => {
+  const loadActiveChatRooms = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -42,11 +42,11 @@ const ChatView: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userProfile]);
 
   useEffect(() => {
     loadActiveChatRooms();
-  }, [userProfile]);
+  }, [userProfile, loadActiveChatRooms]);
 
   if (loading) {
     return (

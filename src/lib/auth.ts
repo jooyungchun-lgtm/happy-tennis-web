@@ -413,7 +413,7 @@ export class AuthService {
   }
 
   // 참여자 목록 가져오기
-  async getParticipants(roomId: string): Promise<any[]> {
+  async getParticipants(roomId: string): Promise<Record<string, unknown>[]> {
     try {
       const participantsSnapshot = await getDocs(collection(db, 'chatRooms', roomId, 'participants'));
       return participantsSnapshot.docs.map(doc => ({
