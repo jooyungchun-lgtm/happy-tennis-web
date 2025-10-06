@@ -349,7 +349,7 @@ export default function TennisCourtsAdmin({ isOpen, onClose }: TennisCourtsAdmin
                     
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => setEditingCourt(court)}
+                        onClick={() => {/* 편집 기능은 추후 구현 예정 */}}
                         className="p-2 text-white/60 hover:text-white transition-colors"
                       >
                         <PencilIcon className="h-4 w-4" />
