@@ -11,6 +11,7 @@ interface GoogleSheetsConfig {
 
 class GoogleSheetsService {
   private static instance: GoogleSheetsService;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private sheets: any;
   private config: GoogleSheetsConfig;
 
