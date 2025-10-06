@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { AuthService } from '@/lib/auth';
-// import { UserProfile } from '@/types/models';
+import { Participant } from '@/types/models';
 import { 
   UserIcon, 
   CheckIcon, 
@@ -10,18 +10,7 @@ import {
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
-interface Participant {
-  id: string;
-  name: string;
-  gender: string;
-  isHost: boolean;
-  isConfirmed: boolean;
-  role: string;
-  ntrp: number;
-  experience: number;
-  ageGroup: string;
-  homeCourt: string;
-}
+// Participant 타입은 @/types/models에서 import
 
 interface ParticipantListProps {
   roomId: string;
