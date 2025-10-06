@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import CreateRoomModal from '@/components/main/CreateRoomModal';
+import ChatView from '@/components/main/ChatView';
 import ProfileView from '@/components/profile/ProfileView';
 import { 
   HomeIcon, 
@@ -39,7 +40,7 @@ const TabBar: React.FC<TabBarProps> = ({ children }) => {
       name: '채팅',
       icon: ChatBubbleLeftRightIcon,
       activeIcon: ChatIconSolid,
-      component: <div className="p-4 text-white">채팅 기능 (구현 예정)</div>
+      component: <ChatView />
     },
     {
       id: 2,

@@ -74,6 +74,7 @@ class TennisCourtsService {
 
   // 주기적 동기화 시작
   private startPeriodicSync(): void {
+    // 1시간마다 구글 시트와 동기화
     setInterval(async () => {
       try {
         const googleSheetsData = await googleSheetsService.readTennisCourts();
@@ -86,7 +87,7 @@ class TennisCourtsService {
       } catch (error) {
         console.error('주기적 동기화 실패:', error);
       }
-    }, this.syncInterval);
+    }, 60 * 60 * 1000);
   }
 
   private organizeFacilities(): void {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MagnifyingGlassIcon, FunnelIcon } from '@heroicons/react/24/outline';
 import { ChatRoom } from '@/types/models';
 
@@ -74,9 +74,9 @@ export default function SearchAndFilter({ chatRooms, onFilteredRooms }: SearchAn
   };
 
   // 필터 변경 시 자동 적용
-  useState(() => {
+  useEffect(() => {
     applyFilters();
-  });
+  }, [searchTerm, selectedNtrp, selectedRegion, selectedDate, selectedGameType, chatRooms]);
 
   return (
     <div className="bg-white/5 border-b border-white/10 p-4">
