@@ -22,7 +22,6 @@ export function useRealtimeChat(roomId: string) {
           const data = doc.data();
           newMessages.push({
             id: doc.id,
-            roomId: roomId,
             senderId: data.senderId,
             senderName: data.senderName,
             content: data.content,
