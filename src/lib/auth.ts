@@ -24,7 +24,7 @@ import {
   writeBatch
 } from 'firebase/firestore';
 import { auth, db } from './firebase';
-import { UserProfile, Membership, ChatRoom, ChatMessage } from '@/types/models';
+import { UserProfile, Membership, ChatRoom, ChatMessage, Participant } from '@/types/models';
 import { moderationService } from './moderation';
 
 export class AuthService {
@@ -413,13 +413,13 @@ export class AuthService {
   }
 
   // 참여자 목록 가져오기
-  async getParticipants(roomId: string): Promise<Record<string, unknown>[]> {
+  async getParticipants(roomId: string): Promise<Participant[]> {
     try {
       const participantsSnapshot = await getDocs(collection(db, 'chatRooms', roomId, 'participants'));
       return participantsSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      } as Participant));
     } catch (error) {
       console.error('Get participants error:', error);
       throw error;
