@@ -74,8 +74,8 @@ class GoogleSheetsService {
       const dataRows = rows.slice(1);
       
       const tennisCourts: TennisCourt[] = dataRows
-        .filter(row => row.length >= 6) // 최소 필요한 컬럼이 있는지 확인
-        .map((row) => ({
+        .filter((row: any) => row.length >= 6) // 최소 필요한 컬럼이 있는지 확인
+        .map((row: any) => ({
           facility_name: row[0] || '',
           region: row[1] || '',
           court_number: row[4] || '',
